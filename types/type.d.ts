@@ -1,7 +1,7 @@
 import { TextInputProps, TouchableOpacityProps } from "react-native";
 
 declare interface Driver {
-  id: str;
+  id: number;
   first_name: string;
   last_name: string;
   profile_image_url: string;
@@ -81,6 +81,8 @@ declare interface GoogleInputProps {
 declare interface InputFieldProps extends TextInputProps {
   label: string;
   icon?: any;
+  emoji?: string;
+  colors?: readonly [string, string, ...string[]];
   secureTextEntry?: boolean;
   labelStyle?: string;
   containerStyle?: string;

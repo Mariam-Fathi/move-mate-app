@@ -1,17 +1,22 @@
 import { useSignUp } from "@clerk/clerk-expo";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, StatusBar, Text, View } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import { icons, images } from "@/constants";
 import { fetchAPI } from "@/lib/fetch";
+import OAuth from "@/components/OAuth";
 
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // const [emoji, setEmoji] = useState("");
+  // const [colors, setColors] =
+  //   useState<readonly [string, string, ...string[]]>();
 
   const [form, setForm] = useState({
     name: "",
@@ -23,6 +28,270 @@ const SignUp = () => {
     error: "",
     code: "",
   });
+
+  // const handleStrongPassword = (value: string) => {
+  //   const lengthCriteria = value.length >= 8;
+  //   const hasUpperCase = /[A-Z]/.test(value);
+  //   const hasLowerCase = /[a-z]/.test(value);
+  //   const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+  //   const hasDigits = /\d/.test(value);
+  //   setForm({ ...form, password: value });
+  //   const passwordLength = value.length;
+  //   switch (true) {
+  //     case passwordLength === 0:
+  //       setEmoji("");
+  //       setColors(["#d4d4d4", "#d4d4d4", "#d4d4d4"]);
+  //       break;
+  //     case value.length < 2:
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "red",
+  //       ]);
+  //       break;
+  //     case value.length < 3:
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "red",
+  //         "red",
+  //       ]);
+  //       break;
+  //     case value.length < 4:
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "red",
+  //         "red",
+  //         "red",
+  //       ]);
+  //       break;
+  //     case value.length < 5:
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "red",
+  //         "red",
+  //         "red",
+  //       ]);
+  //       break;
+  //     case value.length < 6:
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "red",
+  //         "red",
+  //         "red",
+  //         "red",
+  //       ]);
+  //       break;
+  //     case value.length < 8:
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#facc15",
+  //         "#facc15",
+  //       ]);
+  //       break;
+  //     case (lengthCriteria &&
+  //       hasUpperCase &&
+  //       !hasLowerCase &&
+  //       !hasDigits &&
+  //       !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasLowerCase &&
+  //         !hasUpperCase &&
+  //         !hasDigits &&
+  //         !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasDigits &&
+  //         !hasLowerCase &&
+  //         !hasUpperCase &&
+  //         !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasSpecialChars &&
+  //         !hasLowerCase &&
+  //         !hasDigits &&
+  //         !hasUpperCase):
+  //       setEmoji("🙂");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#facc15",
+  //         "#facc15",
+  //         "#facc15",
+  //         "#facc15",
+  //       ]);
+  //       break;
+  //     case (lengthCriteria &&
+  //       hasLowerCase &&
+  //       hasUpperCase &&
+  //       !hasDigits &&
+  //       !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasLowerCase &&
+  //         hasDigits &&
+  //         !hasUpperCase &&
+  //         !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasLowerCase &&
+  //         hasSpecialChars &&
+  //         !hasDigits &&
+  //         !hasUpperCase) ||
+  //       (lengthCriteria &&
+  //         hasUpperCase &&
+  //         hasDigits &&
+  //         !hasLowerCase &&
+  //         !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasUpperCase &&
+  //         hasSpecialChars &&
+  //         !hasDigits &&
+  //         !hasLowerCase) ||
+  //       (lengthCriteria &&
+  //         hasDigits &&
+  //         hasSpecialChars &&
+  //         !hasLowerCase &&
+  //         !hasUpperCase):
+  //       setEmoji("🙄");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#facc15",
+  //         "#facc15",
+  //         "#facc15",
+  //         "#facc15",
+  //         "#facc15",
+  //       ]);
+  //       break;
+  //     case (lengthCriteria &&
+  //       hasLowerCase &&
+  //       hasUpperCase &&
+  //       hasDigits &&
+  //       !hasSpecialChars) ||
+  //       (lengthCriteria &&
+  //         hasLowerCase &&
+  //         hasDigits &&
+  //         hasSpecialChars &&
+  //         !hasUpperCase) ||
+  //       (lengthCriteria &&
+  //         hasLowerCase &&
+  //         hasSpecialChars &&
+  //         !hasDigits &&
+  //         hasUpperCase) ||
+  //       (lengthCriteria &&
+  //         hasUpperCase &&
+  //         hasDigits &&
+  //         !hasLowerCase &&
+  //         hasSpecialChars):
+  //       setEmoji("🤏");
+  //       setColors([
+  //         "#d4d4d4",
+  //         "#d4d4d4",
+  //         "#22c55e",
+  //         "#22c55e",
+  //         "#22c55e",
+  //         "#22c55e",
+  //         "#22c55e",
+  //         "#22c55e",
+  //         "#22c55e",
+  //       ]);
+  //       break;
+  //     case lengthCriteria &&
+  //       hasLowerCase &&
+  //       hasUpperCase &&
+  //       hasDigits &&
+  //       hasSpecialChars:
+  //       setEmoji("✔️");
+  //       setColors(["#22c55e", "#22c55e"]);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
@@ -83,6 +352,8 @@ const SignUp = () => {
   };
   return (
     <ScrollView className="flex-1 bg-white">
+      <StatusBar barStyle="dark-content" />
+
       <View className="flex-1 bg-white">
         <View className="relative w-full h-[250px]">
           <Image source={images.signUpCar} className="z-0 w-full h-[250px]" />
@@ -114,12 +385,15 @@ const SignUp = () => {
             textContentType="password"
             value={form.password}
             onChangeText={(value) => setForm({ ...form, password: value })}
+            // emoji={emoji}
+            // colors={colors}
           />
           <CustomButton
             title="Sign Up"
             onPress={onSignUpPress}
             className="mt-6"
           />
+          <OAuth title="Sign Up with Google" />
           <Link
             href="/sign-in"
             className="text-lg text-center text-general-200 mt-10"

@@ -1,7 +1,7 @@
 import { useSignIn } from "@clerk/clerk-expo";
 import { Link, router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, StatusBar, Text, View } from "react-native";
 
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
@@ -29,6 +29,7 @@ const SignIn = () => {
         await setActive({ session: signInAttempt.createdSessionId });
         router.replace("/(root)/(tabs)/home");
       } else {
+        // See https://clerk.com/docs/custom-flows/error-handling for more info on error handling
         console.log(JSON.stringify(signInAttempt, null, 2));
         Alert.alert("Error", "Log in failed. Please try again.");
       }
@@ -40,6 +41,8 @@ const SignIn = () => {
 
   return (
     <ScrollView className="flex-1 bg-white">
+      <StatusBar barStyle="dark-content" />
+
       <View className="flex-1 bg-white">
         <View className="relative w-full h-[250px]">
           <Image source={images.signUpCar} className="z-0 w-full h-[250px]" />
@@ -73,6 +76,9 @@ const SignIn = () => {
             onPress={onSignInPress}
             className="mt-6"
           />
+
+          <OAuth title="Log In with Google" />
+
           <Link
             href="/sign-up"
             className="text-lg text-center text-general-200 mt-10"

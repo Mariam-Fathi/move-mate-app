@@ -24,6 +24,7 @@ const FindRide = () => {
           placeholderText={userAddress || "From location"}
           leftIcon={icons.point}
           rightIcon={icons.target}
+          handleLocation={setUserLocation}
         />
       </View>
 
@@ -34,6 +35,7 @@ const FindRide = () => {
           placeholderText={destinationAddress || "To location"}
           leftIcon={icons.point}
           rightIcon={icons.map}
+          handleLocation={setDestinationLocation}
         />
       </View>
 

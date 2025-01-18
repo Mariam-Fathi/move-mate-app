@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useRef, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, StatusBar, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Swiper from "react-native-swiper";
 
@@ -15,6 +15,8 @@ const Home = () => {
 
   return (
     <SafeAreaView className="flex h-full items-center justify-between bg-white">
+      <StatusBar barStyle="dark-content" />
+
       <TouchableOpacity
         onPress={() => {
           router.replace("/(auth)/sign-up");
@@ -53,16 +55,17 @@ const Home = () => {
           </View>
         ))}
       </Swiper>
-
-      <CustomButton
-        title={isLastSlide ? "Get Started" : "Next"}
-        onPress={() =>
-          isLastSlide
-            ? router.replace("/(auth)/sign-up")
-            : swiperRef.current?.scrollBy(1)
-        }
-        className="w-11/12 mt-10 mb-5"
-      />
+      <View className="px-5 w-full">
+        <CustomButton
+          title={isLastSlide ? "Get Started" : "Next"}
+          onPress={() =>
+            isLastSlide
+              ? router.replace("/(auth)/sign-up")
+              : swiperRef.current?.scrollBy(1)
+          }
+          className="mt-10 mb-5"
+        />
+      </View>
     </SafeAreaView>
   );
 };

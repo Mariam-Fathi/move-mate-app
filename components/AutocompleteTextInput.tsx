@@ -23,14 +23,21 @@ const AutocompleteTextInput = ({
   placeholderText,
   leftIcon,
   rightIcon,
-  handleOnPress,
+  handleLocation,
 }: {
   placeholderText?: string;
   leftIcon?: ImageSourcePropType;
   rightIcon?: ImageSourcePropType;
-  handleOnPress?: () => void;
+  handleLocation: ({
+    latitude,
+    longitude,
+    address,
+  }: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => void;
 }) => {
-  const { setDestinationLocation } = useLocationStore();
   const [query, setQuery] = useState<string>("");
   const [data, setData] = useState<LocationData[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -65,10 +72,10 @@ const AutocompleteTextInput = ({
     [fetchLocations]
   );
 
-  const handleDestinationSelect = useCallback(
+  const handleLocationSelect = useCallback(
     (location: LocationData) => {
       setQuery(location.formatted);
-      setDestinationLocation({
+      handleLocation({
         latitude: location.lat,
         longitude: location.lon,
         address: location.formatted,
@@ -76,7 +83,7 @@ const AutocompleteTextInput = ({
       setData(null);
       router.push("/(root)/find-ride");
     },
-    [setDestinationLocation]
+    [handleLocation]
   );
 
   return (
@@ -151,7 +158,7 @@ const AutocompleteTextInput = ({
         }}
         renderItem={({ item, index }) => (
           <Pressable
-            onPress={() => handleDestinationSelect(item)}
+            onPress={() => handleLocationSelect(item ?? {})}
             style={{
               padding: 10,
               borderBottomWidth: data && index === data.length - 1 ? 0 : 1,

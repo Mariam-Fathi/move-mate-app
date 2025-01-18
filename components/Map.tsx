@@ -1,118 +1,160 @@
 import React, { useEffect, useState } from "react";
-import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
-import { useLocationStore } from "@/store"; // Adjust path as needed
 import { ActivityIndicator, Text, View } from "react-native";
-import { icons } from "@/constants";
+import MapView, {
+  Marker,
+  Polyline,
+  PROVIDER_DEFAULT,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 
-const mokedDriver = [
-  {
-    id: "1",
-    first_name: "James",
-    last_name: "Wilson",
-    profile_image_url:
-      "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
-    car_image_url:
-      "https://ucarecdn.com/a2dc52b2-8bf7-4e49-9a36-3ffb5229ed02/-/preview/465x466/",
-    car_seats: 4,
-    latitude: 30.3141955,
-    longitude: 31.3122847,
-    rating: "4.80",
-  },
-  {
-    id: "2",
-    first_name: "David",
-    last_name: "Brown",
-    profile_image_url:
-      "https://ucarecdn.com/6ea6d83d-ef1a-483f-9106-837a3a5b3f67/-/preview/1000x666/",
-    car_image_url:
-      "https://ucarecdn.com/a3872f80-c094-409c-82f8-c9ff38429327/-/preview/930x932/",
-    car_seats: 5,
-    latitude: 30.3141955,
-    longitude: 31.3122847,
-    rating: "4.60",
-  },
-  {
-    id: "3",
-    first_name: "Michael",
-    last_name: "Johnson",
-    profile_image_url:
-      "https://ucarecdn.com/0330d85c-232e-4c30-bd04-e5e4d0e3d688/-/preview/826x822/",
-    car_image_url:
-      "https://ucarecdn.com/289764fb-55b6-4427-b1d1-f655987b4a14/-/preview/930x932/",
-    car_seats: 4,
-    latitude: 30.3141955,
-    longitude: 31.3122847,
-    rating: "4.70",
-  },
-  {
-    id: "4",
-    first_name: "Robert",
-    last_name: "Green",
-    profile_image_url:
-      "https://ucarecdn.com/fdfc54df-9d24-40f7-b7d3-6f391561c0db/-/preview/626x417/",
-    car_image_url:
-      "https://ucarecdn.com/b6fb3b55-7676-4ff3-8484-fb115e268d32/-/preview/930x932/",
-    car_seats: 4,
-    latitude: 30.3141955,
-    longitude: 31.3122847,
-    rating: "4.90",
-  },
-];
+import { icons } from "@/constants";
+import { useFetch } from "@/lib/fetch";
+import {
+  calculateDriverTimes,
+  calculateRegion,
+  generateMarkersFromData,
+} from "@/lib/map";
+import { useDriverStore, useLocationStore } from "@/store";
+import { Driver, MarkerData } from "@/types/type";
+
+const directionsAPI = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY;
 
 const Map = () => {
-  const [loading, setLoading] = useState(true);
+  const {
+    userLongitude,
+    userLatitude,
+    destinationLatitude,
+    destinationLongitude,
+  } = useLocationStore();
+  const { selectedDriver, setDrivers } = useDriverStore();
 
-  const markerIconUrl = `https://api.geoapify.com/v1/icon?size=xx-large&type=awesome&color=%233e9cfe&icon=paw&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`;
+  const { data: drivers, loading, error } = useFetch<Driver[]>("/(api)/driver");
+  const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [routeCoordinates, setRouteCoordinates] = useState<
+    { latitude: number; longitude: number }[]
+  >([]);
 
-  // state management for user location
-  const { userLongitude, userLatitude } = useLocationStore();
-
-  // Ensure that the user location is valid
   useEffect(() => {
-    if (userLatitude && userLongitude) {
-      setLoading(false);
-    }
-  }, [userLatitude, userLongitude]);
+    if (Array.isArray(drivers)) {
+      if (!userLatitude || !userLongitude) return;
 
-  // If loading, do not render the map
-  if (loading || !userLatitude || !userLongitude) {
+      const newMarkers = generateMarkersFromData({
+        data: drivers,
+        userLatitude,
+        userLongitude,
+      });
+
+      setMarkers(newMarkers);
+    }
+  }, [drivers, userLatitude, userLongitude]);
+
+  useEffect(() => {
+    if (markers.length > 0 && destinationLatitude && destinationLongitude) {
+      const fetchRoute = async () => {
+        try {
+          const url = `https://api.geoapify.com/v1/routing?waypoints=${userLatitude},${userLongitude}|${destinationLatitude},${destinationLongitude}&mode=drive&apiKey=${directionsAPI}`;
+          const response = await fetch(url);
+          const data = await response.json();
+
+          // Ensure we get valid route coordinates
+          const multiLineString = data.features[0]?.geometry?.coordinates;
+
+          if (multiLineString && Array.isArray(multiLineString)) {
+            // Flatten all lines into a single array of points
+            const flattenedCoordinates = multiLineString
+              .flat()
+              .map(([longitude, latitude]: [number, number]) => ({
+                latitude,
+                longitude,
+              }));
+            setRouteCoordinates(flattenedCoordinates);
+          } else {
+            console.error("Invalid route geometry from API");
+          }
+        } catch (error) {
+          console.error("Error fetching route:", error);
+        }
+      };
+
+      fetchRoute();
+
+      calculateDriverTimes({
+        markers,
+        userLatitude,
+        userLongitude,
+        destinationLatitude,
+        destinationLongitude,
+      }).then((drivers) => {
+        setDrivers(drivers as MarkerData[]);
+      });
+    }
+  }, [markers, destinationLatitude, destinationLongitude]);
+
+  const region = calculateRegion({
+    userLatitude,
+    userLongitude,
+    destinationLatitude,
+    destinationLongitude,
+  });
+
+  if (loading || (!userLatitude && !userLongitude))
     return (
-      <View className="w-full h-full justify-center items-center">
-        <ActivityIndicator />
+      <View className="flex justify-between items-center w-full">
+        <ActivityIndicator size="small" color="#000" />
       </View>
     );
-  }
 
-  console.log("User Location:", userLatitude, userLongitude);
+  if (error)
+    return (
+      <View className="flex justify-between items-center w-full">
+        <Text>Error: {error}</Text>
+      </View>
+    );
 
   return (
     <MapView
       provider={PROVIDER_DEFAULT}
       style={{ width: "100%", height: "100%" }}
-      region={{
-        latitude: userLatitude,
-        longitude: userLongitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }}
+      mapType="standard"
+      showsPointsOfInterest={false}
+      initialRegion={region}
       showsUserLocation={true}
       userInterfaceStyle="light"
-      showsPointsOfInterest={false}
     >
-      {mokedDriver.map((driver) => {
-        const latOffset = (Math.random() - 0.5) * 0.01;
-        const lngOffset = (Math.random() - 0.5) * 0.01;
-        return (
+      {markers.map((marker, index) => (
+        <Marker
+          key={marker.id}
+          coordinate={{
+            latitude: marker.latitude,
+            longitude: marker.longitude,
+          }}
+          title={marker.title}
+          image={
+            selectedDriver === +marker.id ? icons.selectedMarker : icons.marker
+          }
+        />
+      ))}
+
+      {destinationLatitude && destinationLongitude && (
+        <>
+          {routeCoordinates.length > 0 && (
+            <Polyline
+              coordinates={routeCoordinates}
+              strokeColor="#FF0000" // Red color for the line
+              strokeWidth={3}
+            />
+          )}
           <Marker
-            key={driver.id}
+            key="destination"
             coordinate={{
-              latitude: driver.latitude + +latOffset,
-              longitude: driver.longitude + lngOffset,
+              latitude: destinationLatitude,
+              longitude: destinationLongitude,
             }}
-            image={icons.marker}
+            title="Destination"
+            image={icons.pin}
           />
-        );
-      })}
+        </>
+      )}
     </MapView>
   );
 };

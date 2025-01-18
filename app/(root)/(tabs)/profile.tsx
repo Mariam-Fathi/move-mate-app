@@ -3,9 +3,17 @@ import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import InputField from "@/components/InputField";
+import { useFetch } from "@/lib/fetch";
 
 const Profile = () => {
   const { user } = useUser();
+  const {
+    data: userDetails,
+    loading: userDetailsLoading,
+    error: userDetailsError,
+  } = useFetch<[{ name: string }]>(
+    `/(api)/${user?.emailAddresses[0].emailAddress}`
+  );
 
   return (
     <SafeAreaView className="flex-1">
@@ -29,7 +37,11 @@ const Profile = () => {
           <View className="flex flex-col items-start justify-start w-full">
             <InputField
               label="First name"
-              placeholder={user?.firstName || "Not Found"}
+              placeholder={
+                userDetails
+                  ? userDetails[0]?.name
+                  : user?.firstName || "Not Found"
+              }
               containerStyle="w-full"
               inputStyle="p-3.5"
               editable={false}

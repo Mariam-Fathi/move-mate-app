@@ -11,7 +11,7 @@ const DriverCard = ({ item, selected, setSelected }: DriverCardProps) => {
       onPress={setSelected}
       className={`${
         selected === item.id ? "bg-general-600" : "bg-white"
-      } flex flex-row items-center justify-between py-5 px-3 rounded-xl`}
+      } flex flex-row items-center justify-between py-5 rounded-xl`}
     >
       <Image
         source={{ uri: item.profile_image_url }}
@@ -41,7 +41,7 @@ const DriverCard = ({ item, selected, setSelected }: DriverCardProps) => {
           </Text>
 
           <Text className="text-sm font-JakartaRegular text-general-800">
-            {formatTime(item.time!)}
+            {formatTime(parseInt(`${item.time}`))}
           </Text>
 
           <Text className="text-sm font-JakartaRegular text-general-800 mx-1">

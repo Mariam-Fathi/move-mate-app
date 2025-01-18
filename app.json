@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "move-mate-app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -23,7 +23,29 @@
       "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [["expo-router", { "origin": "https://uber.com/" }]],
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://move-mate-app.expo.app"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.ccom.fullstackstripeapp",
+          "publishableKey": "pk_test_51QgYSRDc5aXtM2Cdso8MF2NCniMTwYhpgDvlgi2RmNVneOEdCDXBkK5qP8RaV2XmhHTm3OemO0LiaBJym1UlhwoT00bKlAUw67"
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }

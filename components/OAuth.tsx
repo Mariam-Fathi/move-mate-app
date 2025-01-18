@@ -6,19 +6,19 @@ import CustomButton from "@/components/CustomButton";
 import { icons } from "@/constants";
 import { googleOAuth } from "@/lib/auth";
 
-const OAuth = () => {
-  //   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+const OAuth = ({ title }: { title: string }) => {
+  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
-  //   const handleGoogleSignIn = async () => {
-  //     const result = await googleOAuth(startOAuthFlow);
+  const handleGoogleSignIn = async () => {
+    const result = await googleOAuth(startOAuthFlow);
 
-  //     if (result.code === "session_exists") {
-  //       Alert.alert("Success", "Session exists. Redirecting to home screen.");
-  //       router.replace("/(root)/home");
-  //     }
+    if (result.code === "session_exists") {
+      Alert.alert("Success", "Session exists. Redirecting to home screen.");
+      router.replace("/(root)/(tabs)/home");
+    }
 
-  //     Alert.alert(result.success ? "Success" : "Error", result.message);
-  //   };
+    Alert.alert(result.success ? "Success" : "Error", result.message);
+  };
 
   return (
     <View>
@@ -29,7 +29,7 @@ const OAuth = () => {
       </View>
 
       <CustomButton
-        title="Log In with Google"
+        title={title}
         className="mt-5 w-full shadow-none"
         IconLeft={() => (
           <Image
@@ -40,7 +40,7 @@ const OAuth = () => {
         )}
         bgVariant="outline"
         textVariant="primary"
-        // onPress={handleGoogleSignIn}
+        onPress={handleGoogleSignIn}
       />
     </View>
   );
